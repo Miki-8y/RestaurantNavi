@@ -1,0 +1,39 @@
+<table align="left">
+    <tr>
+        <td>
+            <h4><b>あ</b></h4>
+        </td>
+    </tr>
+</table>
+
+
+<button type="button" onclick="getLocation()">現在地取得</button>
+<div id="display1"></div>
+<div id="display2"></div>
+
+<script>
+    let display1 = document.getElementById("display1")
+    let display2 = document.getElementById("display2")
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        $.ajax({
+            type: 'GET',
+            url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&sensor=true&key=AIzaSyAJFeKqH32Px6AJ5VDIwuIs8E8Zs-FSjk0&language=en`,
+        }).then(function (response) {
+            console.log(response)
+            dis1 = Number(response.results[0].geometry.location.lat)
+            dis2 = Number(response.results[0].geometry.location.lng)
+            display1.textContent = dis1
+            display2.textContent = dis2
+        })
+
+    }
+</script>

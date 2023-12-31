@@ -1,0 +1,7 @@
+create table accounts (
+    username VARCHAR(40) primary key,
+    salt VARCHAR(40),
+    hashed VARCHAR(40),
+    algo CHAR(5),
+    write_word VARCHAR(30)
+);
