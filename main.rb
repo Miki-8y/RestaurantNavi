@@ -2,6 +2,10 @@ require 'digest/md5'
 require 'sinatra'
 require 'active_record'
 require 'securerandom'
+require 'dotenv'
+
+# API_KEYを管理
+Dotenv.load
 
 set :environment, :production
 set :sessions, 
@@ -26,17 +30,25 @@ ESCAPE_SS = {
 
 CHECK = ["<font","<h1>","<h2>","<h3>","<h4>","<h5>","<h6>","</font>","</h1>","</h2>","</h3>","</h4>","</h5>","</h6>"]
 
+before do
+    response.headers['Access-Control-Allow-Origin'] = '*'
+end
+
 get '/' do
     redirect '/searchconditions'
 end
 
 get '/searchconditions' do
+
     erb :'/RestaurantNavi/searchconditions', :layout => :'/RestaurantNavi/layout'
 end
 
 post '/condition' do
-    latitude = params[:la]
-    longitude = params[:lo]
+    # latitude = params[:la]
+    # longitude = params[:lo]
+    latitude = 56
+    longitude = 168
+
     puts(latitude)
     puts(longitude)
     # <%= ENV['RECRUIT_API_KEY']%>
