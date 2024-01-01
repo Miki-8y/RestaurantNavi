@@ -1,0 +1,97 @@
+<table width="150" align="center" cellpadding="1" style="table-layout: fixed;">
+    <tr>
+        <td>
+            <button type="button" onclick="getLocation()">現在地取得</button><br>
+        </td>
+    </tr>
+</table>
+
+<table width="300" align="center" cellpadding="1" style="table-layout: fixed;">
+    <tr>
+        <td>
+            <h4>緯度 <div id="lat"></div>
+            </h4>
+        </td>
+        <td>
+            <h4>経度 <div id="lon"></div>
+            </h4>
+        </td>
+    </tr>
+</table>
+<table align="center">
+    <tr>
+        <td>
+            <div id="status"></div>
+        </td>
+    </tr>
+</table>
+
+<table width="450" align="center" cellpadding="1" style="table-layout: fixed;">
+    <%# <form action="/detail" method="post"> %>
+    <tr>
+        <td>
+            <div id="rn_list"></div>
+        </td>
+    </tr>
+    <tr>
+
+        <%# <td><input class="btn btn-primary btn-lg" type="submit" value="詳細"></td>
+        </tr>
+    </form> %>
+</table>
+
+<script>
+    let lat = document.getElementById("lat");
+    let lon = document.getElementById("lon");
+    // let restaurant_name = document.getElementById("restaurant_name");
+
+    const status = document.getElementById("status");
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+            status.textContent = "このブラウザは位置情報に対応していません．";
+        }
+    };
+
+    function success(position) {
+        // response_text.textContent = "";
+        status.textContent = "";
+        restaurant_name = "";
+
+        $.ajax({
+            type: 'GET',
+            // dataType: "jsonp",
+            // url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&sensor=true&key=&language=en`,
+            url: `http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=<%= ENV["HOT_PEPPER_API_KEY"]%>&lat=${position.coords.latitude}&lng=${position.coords.longitude}&range=5&format=json`,
+        }).then(function (response) {
+            const data = JSON.parse(response)
+            console.log(data)
+
+            //rn_listを初期化
+            document.getElementById("rn_list").innerHTML = "";
+
+            for (let i = 0; i < data.results.shop.length; i++) {
+                // jQueryを使ってお店の名前を取得
+                $("#rn_list").append("<img src=" + data.results.shop[i].logo_image + ">" + "<br>");
+                $("#rn_list").append("店舗名称：" + data.results.shop[i].name + "(" +
+                    data.results.shop[i].name_kana + ")" + "<br>");
+                $("#rn_list").append("交通アクセス：" + data.results.shop[i].access + "<br>");
+                $("#rn_list").append("携帯用交通アクセス：" + data.results.shop[i].mobile_access + "<br><br>");
+                // ***javascriptだけでやる方法***
+                // const restaurant_name = document.createElement("restaurant_name");
+                // restaurant_name.textContent = data.results.shop[i].name;
+                // document.getElementById("rn_list").appendChild(restaurant_name);
+                // *****************************
+            }
+            lat.textContent = position.coords.latitude;
+            lon.textContent = position.coords.longitude;
+        })
+
+    };
+
+    function error(position) {
+
+    };
+</script>

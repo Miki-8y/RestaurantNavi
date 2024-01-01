@@ -35,31 +35,34 @@ before do
 end
 
 get '/' do
-    redirect '/searchconditions'
+    redirect '/top'
 end
 
-get '/searchconditions' do
-
-    erb :'/RestaurantNavi/searchconditions', :layout => :'/RestaurantNavi/layout'
+get '/top' do
+    erb :'/RestaurantNavi/Top/index', :layout => :'/RestaurantNavi/Top/layout'
 end
 
-post '/condition' do
+post '/detail' do
     # latitude = params[:la]
     # longitude = params[:lo]
-    latitude = 56
-    longitude = 168
+    # latitude = 56
+    # longitude = 168
 
-    puts(latitude)
-    puts(longitude)
-    # <%= ENV['RECRUIT_API_KEY']%>
-    baseUrl = "http://webservice.recruit.co.jp/hotpepper/gourmet/v1/"
-    format_j = "json"
-    uri = URI.parse(baseUrl+"?key=8fca40acabfe3dab&lat=" + latitude.to_s + "&lng=" + longitude.to_s + "&range=5&format=" + format_j)
-    json = Net::HTTP.get(uri)
-    result = JSON.parse(json, {symbolize_names: true})
+    # puts(latitude)
+    # puts(longitude)
+    # # <%= ENV['RECRUIT_API_KEY']%>
+    # baseUrl = "http://webservice.recruit.co.jp/hotpepper/gourmet/v1/"
+    # format_j = "json"
+    # uri = URI.parse(baseUrl+"?key=8fca40acabfe3dab&lat=" + latitude.to_s + "&lng=" + longitude.to_s + "&range=5&format=" + format_j)
+    # json = Net::HTTP.get(uri)
+    # result = JSON.parse(json, {symbolize_names: true})
 
-    puts(result)
-    redirect '/searchconditions'
+    # puts(result)
+    redirect '/detail'
+end
+
+get '/detail' do
+    erb :'/RestaurantNavi/Detail/index', :layout => :'/RestaurantNavi/Top/layout'
 end
 
 ######################プロフィールページ(Aboutページ)####################
