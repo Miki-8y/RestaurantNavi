@@ -27,17 +27,11 @@
 </table>
 
 <table width="450" align="center" cellpadding="1" style="table-layout: fixed;">
-    <%# <form action="/detail" method="post"> %>
     <tr>
         <td>
             <div id="rn_list"></div>
         </td>
     </tr>
-    <tr>
-
-        <%# <td><input class="btn btn-primary btn-lg" type="submit" value="詳細"></td>
-        </tr>
-    </form> %>
 </table>
 
 <script>
@@ -73,12 +67,32 @@
             document.getElementById("rn_list").innerHTML = "";
 
             for (let i = 0; i < data.results.shop.length; i++) {
-                // jQueryを使ってお店の名前を取得
+                // jQueryを使って店舗情報を取得
                 $("#rn_list").append("<img src=" + data.results.shop[i].logo_image + ">" + "<br>");
                 $("#rn_list").append("店舗名称：" + data.results.shop[i].name + "(" +
                     data.results.shop[i].name_kana + ")" + "<br>");
                 $("#rn_list").append("交通アクセス：" + data.results.shop[i].access + "<br>");
-                $("#rn_list").append("携帯用交通アクセス：" + data.results.shop[i].mobile_access + "<br><br>");
+                $("#rn_list").append("携帯用交通アクセス：" + data.results.shop[i].mobile_access + "<br>");
+                // 店舗詳細用のボタン配置，対応する番号を/detailにpost
+                // detailで使うものも送信すべき（ruby側でデータベースに保存するため）
+                $("#rn_list").append('<form action="/detail" method="post">' +
+                    '<td><input class="btn btn-primary btn-lg" type="submit" value="詳細"></td>' +
+                    '<input type="hidden" name="r_id" value=' + i + '>' +
+                    '<input type="hidden" name="r_name" value=' + data.results.shop[i].name + '>' +
+                    '<input type="hidden" name="r_logoimage_url" value=' +
+                    data.results.shop[i].logo_image + '>' +
+                    '<input type="hidden" name="r_address" value=' + data.results.shop[i].address + '>' +
+                    '<input type="hidden" name="r_access" value=' + data.results.shop[i].access + '>' +
+                    '<input type="hidden" name="r_mobile_access" value=' +
+                    data.results.shop[i].mobile_access + '>' +
+                    '<input type="hidden" name="r_photo_url" value=' +
+                    data.results.shop[i].photo_url + '>' +
+                    '<input type="hidden" name="r_open" value=' + data.results.shop[i].open + '>' +
+                    '<input type="hidden" name="r_close" value=' + data.results.shop[i].close + '>' +
+                    '</form><br><br>');
+
+                // $("#rn_list").append("<button type=" + "button " + " onclick=" + "getLocation()" +
+                //     ">現在地取得</button><br><br>");
                 // ***javascriptだけでやる方法***
                 // const restaurant_name = document.createElement("restaurant_name");
                 // restaurant_name.textContent = data.results.shop[i].name;
@@ -88,7 +102,6 @@
             lat.textContent = position.coords.latitude;
             lon.textContent = position.coords.longitude;
         })
-
     };
 
     function error(position) {

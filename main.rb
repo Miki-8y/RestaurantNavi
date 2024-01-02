@@ -20,6 +20,9 @@ set :sessions,
 ActiveRecord::Base.configurations = YAML.load_file('database.yml')
 ActiveRecord::Base.establish_connection :development
 
+class Storeinfo < ActiveRecord::Base
+end
+
 ESCAPE_SS = {
     '&' => '&amp;',
     '<' => '&lt;',
@@ -39,29 +42,35 @@ get '/' do
 end
 
 get '/top' do
+    Storeinfo.delete_all
     erb :'/RestaurantNavi/Top/index', :layout => :'/RestaurantNavi/Top/layout'
 end
 
 post '/detail' do
-    # latitude = params[:la]
-    # longitude = params[:lo]
-    # latitude = 56
-    # longitude = 168
+    # Debug
+    # id = params[:r_id]
+    # puts(id)
+    s = Storeinfo.new
 
-    # puts(latitude)
-    # puts(longitude)
-    # # <%= ENV['RECRUIT_API_KEY']%>
-    # baseUrl = "http://webservice.recruit.co.jp/hotpepper/gourmet/v1/"
-    # format_j = "json"
-    # uri = URI.parse(baseUrl+"?key=8fca40acabfe3dab&lat=" + latitude.to_s + "&lng=" + longitude.to_s + "&range=5&format=" + format_j)
-    # json = Net::HTTP.get(uri)
-    # result = JSON.parse(json, {symbolize_names: true})
+    # Top画面の詳細をクリックした店舗情報のみをstoreinfoテーブルに保存
+    s.id = params[:r_id]
+    s.name = params[:r_name]
+    s.logoimage_url = params[:r_logoimage_url]
+    s.address = params[:r_address]
+    s.access = params[:r_access]
+    s.mobile_access = params[:r_mobile_access]
+    s.photo_url = params[:r_photo_url]
+    s.open = params[:r_open]
+    s.close = params[:r_close]
 
-    # puts(result)
+    s.save
+
+    $s_id = params[:r_id]
     redirect '/detail'
 end
 
 get '/detail' do
+    @s = Storeinfo.where(id: $s_id)
     erb :'/RestaurantNavi/Detail/index', :layout => :'/RestaurantNavi/Top/layout'
 end
 

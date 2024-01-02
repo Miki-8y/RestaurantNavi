@@ -1,7 +1,11 @@
-create table accounts (
-    username VARCHAR(40) primary key,
-    salt VARCHAR(40),
-    hashed VARCHAR(40),
-    algo CHAR(5),
-    write_word VARCHAR(30)
+create table storeinfos (
+    id INTEGER,
+    name VARCHAR(200),
+    logoimage_url VARCHAR(300),
+    address VARCHAR(200),
+    access VARCHAR(200),
+    mobile_access VARCHAR(200),
+    photo_url VARCHAR(300),
+    open VARCHAR(100),
+    close VARCHAR(50)
 );
