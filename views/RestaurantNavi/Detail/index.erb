@@ -1,6 +1,18 @@
 <table align="left">
     <tr>
         <td>
+            <a href="http://webservice.recruit.co.jp/"><img src="http://webservice.recruit.co.jp/banner/hotpepper-s.gif"
+                    alt="ホットペッパーグルメ Webサービス" width="135" height="17" border="0" title="ホットペッパーグルメ Webサービス"></a>
+        </td>
+        <td>
+            【画像提供：ホットペッパー グルメ】
+        </td>
+    </tr>
+</table>
+<br><br>
+<table align="left">
+    <tr>
+        <td>
             <h4><b>店舗詳細ページです．</b></h4>
         </td>
     </tr>
@@ -9,27 +21,18 @@
 <hr width="600" size="3" noshade>
 
 <% @s.each do |a| %>
-<table width="450" align="center" cellpadding="1" style="table-layout: fixed;">
-    <tr>
-        <td>
-            <img src="<%= a.logoimage_url%>"><br>
-        </td>
-    </tr>
-    <tr>
-        <td style="word-wrap: break-word;" width="615">
-            <b>：店舗名： <font color="#93FFAB"><%= a.name %></font></b></td>
-    </tr>
-    <tr>
-        <td style="word-wrap: break-word;" width="615">
-            <b>：住所： <font color="#93FFAB"><%= a.address %></font></b></td>
-    </tr>
-    <tr>
-        <td style="word-wrap: break-word;" width="615">
-            <b>：営業時間： <font color="#93FFAB"><%= a.open %></font></b></td>
-    </tr>
-    <tr>
-        <td style="word-wrap: break-word;" width="615">
-            <b>：定休日： <font color="#93FFAB"><%= a.close %></font></b></td>
-    </tr>
-</table>
+<div class="rlist">
+    <ul>
+        <img src="<%= a.logoimage_url%>"><br>
+        <div style="text-align: center;"><img src="<%= a.photo_url%>"></div><br>
+
+        <li><b>：店舗名： <font color="#000000"><%= a.name %></font></b></li>
+
+        <li><b>：住所： <font color="#000000"><%= a.address %></font></b></li>
+
+        <li><b>：営業時間： <font color="#000000"><%= a.open %></font></b></li>
+
+        <li><b>：定休日： <font color="#000000"><%= a.close %></font></b></li>
+    </ul>
+</div>
 <% end %>

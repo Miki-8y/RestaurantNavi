@@ -1,6 +1,18 @@
 <table align="left">
     <tr>
         <td>
+            <a href="http://webservice.recruit.co.jp/"><img src="http://webservice.recruit.co.jp/banner/hotpepper-s.gif"
+                    alt="ホットペッパーグルメ Webサービス" width="135" height="17" border="0" title="ホットペッパーグルメ Webサービス"></a>
+        </td>
+        <td>
+            【画像提供：ホットペッパー グルメ】
+        </td>
+    </tr>
+</table>
+<br><br>
+<table align="left">
+    <tr>
+        <td>
             <h4><b>店舗検索ページです．検索半径を指定できます．</b></h4>
         </td>
     </tr>
@@ -93,10 +105,11 @@
             for (let i = 0; i < data.results.shop.length; i++) {
                 // jQueryを使って店舗情報を取得
                 $("#rn_list").append("<img src=" + data.results.shop[i].logo_image + ">" + "<br>");
+                // $("#rn_list").append("<ul>");
                 $("#rn_list").append("店舗名称：" + data.results.shop[i].name + "(" +
                     data.results.shop[i].name_kana + ")" + "<br>");
                 $("#rn_list").append("交通アクセス：" + data.results.shop[i].access + "<br>");
-                $("#rn_list").append("携帯用交通アクセス：" + data.results.shop[i].mobile_access + "<br>");
+                $("#rn_list").append("携帯用交通アクセス：" + data.results.shop[i].mobile_access + "</li><br>");
                 // 店舗詳細用のボタン配置，対応する番号を/detailにpost
                 // detailで使うものも送信すべき（ruby側でデータベースに保存するため）
                 $("#rn_list").append('<form action="/detail" method="post">' +
@@ -131,6 +144,7 @@
                     '<input type="hidden" name="r_close" value="<%="' +
                     data.results.shop[i].close + '"%>">' +
                     '</form><br><br>');
+                // $("#rn_list").append("</ul>");
 
                 // $("#rn_list").append("<button type=" + "button " + " onclick=" + "getLocation()" +
                 //     ">現在地取得</button><br><br>");
