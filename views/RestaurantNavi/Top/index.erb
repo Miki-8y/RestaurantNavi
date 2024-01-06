@@ -13,42 +13,41 @@
 <table align="left">
     <tr>
         <td>
-            <h4><b>店舗検索ページです．検索半径を指定できます．</b></h4>
+            <h4><b>店舗検索ページです．店舗名と検索半径を指定できます．</b></h4>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <h4><b>100件まで表示できます．</b></h4>
         </td>
     </tr>
 </table>
 
 <hr width="600" size="3" noshade>
 
-<table width="300" align="center" cellpadding="10" style="table-layout: fixed;">
+<table align="center" cellpadding="20">
     <tr>
         <td>
-            <select class="form-select" aria-label="Default select example" id="range">
-                <option value="1">300m</option>
-                <option value="2">500m</option>
-                <option value="3">1000m</option>
-                <option value="4">2000m</option>
-                <option value="5">3000m</option>
-            </select>
+            <p>店舗名<br>
+                <input type="text" id="store_name">
+            </p>
+        </td>
+        <td>
+            <p>現在地からの検索半径<br>
+                <select class="form-select" aria-label="Default select example" id="range">
+                    <option value="1">300m</option>
+                    <option value="2">500m</option>
+                    <option value="3">1000m</option>
+                    <option value="4">2000m</option>
+                    <option value="5">3000m</option>
+                </select>
+            </p>
         </td>
         <td>
             <button type="button" class="btn btn-success btn-lg" onclick="getLocation()">検索</button><br>
         </td>
     </tr>
 </table>
-
-<%# <table width="300" align="center" cellpadding="1" style="table-layout: fixed;">
-    <tr>
-        <td>
-            <h4>緯度 <div id="lat"></div>
-            </h4>
-        </td>
-        <td>
-            <h4>経度 <div id="lon"></div>
-            </h4>
-        </td>
-    </tr>
-</table> %>
 
 <table align="center">
     <tr>
@@ -67,52 +66,65 @@
 </table>
 
 <script>
-    const range = document.getElementById("range");
-    console.log(typeof range);
-    console.log(range.value);
+    let URL = ''
 
-    let lat = document.getElementById("lat");
-    let lon = document.getElementById("lon");
-    // let restaurant_name = document.getElementById("restaurant_name");
+    let store_name = document.getElementById("store_name");
+    let range = document.getElementById("range");
 
     const status = document.getElementById("status");
 
     function getLocation() {
+        var options = {
+            // 位置情報報取得に10秒以上かかったらタイムアウトする
+            timeout: 10000
+        };
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(success, error);
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options);
         } else {
             status.textContent = "このブラウザは位置情報に対応していません．";
         }
     };
 
-    function success(position) {
-        // response_text.textContent = "";
+    // 位置情報取得に成功した場合
+    function successCallback(position) {
         status.textContent = "";
         restaurant_name = "";
 
+        // store_nameが入力された場合，検索URLにstore_nameを反映する
+        if (!(store_name.value)) {
+            URL =
+                `http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=<%= ENV["HOT_PEPPER_API_KEY"]%>&lat=${position.coords.latitude}&lng=${position.coords.longitude}&range=${range.value}&count=100&format=json`;
+        } else {
+            URL =
+                `http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=<%= ENV["HOT_PEPPER_API_KEY"]%>&name=${store_name.value}&lat=${position.coords.latitude}&lng=${position.coords.longitude}&range=${range.value}&count=100&format=json`;
+        }
+
         $.ajax({
             type: 'GET',
-            // dataType: "jsonp",
-            // url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&sensor=true&key=&language=en`,
-            url: `http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=<%= ENV["HOT_PEPPER_API_KEY"]%>&lat=${position.coords.latitude}&lng=${position.coords.longitude}&range=${range.value}&format=json`,
+            url: URL,
         }).then(function (response) {
             const data = JSON.parse(response)
             console.log(data)
+
+            if (data.results.results_available == 0) {
+                status.textContent = "１件もありませんでした．";
+            }
 
             //rn_listを初期化
             document.getElementById("rn_list").innerHTML = "";
 
             for (let i = 0; i < data.results.shop.length; i++) {
                 // jQueryを使って店舗情報を取得
-                $("#rn_list").append("<img src=" + data.results.shop[i].logo_image + ">" + "<br>");
-                // $("#rn_list").append("<ul>");
+                $("#rn_list").append('<div style="text-align:center;"><img src="' +
+                    data.results.shop[i].logo_image + '"></div>');
                 $("#rn_list").append("店舗名称：" + data.results.shop[i].name + "(" +
                     data.results.shop[i].name_kana + ")" + "<br>");
                 $("#rn_list").append("交通アクセス：" + data.results.shop[i].access + "<br>");
                 $("#rn_list").append("携帯用交通アクセス：" + data.results.shop[i].mobile_access + "</li><br>");
+
                 // 店舗詳細用のボタン配置，対応する番号を/detailにpost
                 // detailで使うものも送信すべき（ruby側でデータベースに保存するため）
-                $("#rn_list").append('<form action="/detail" method="post">' +
+                $("#rn_list").append('<div style="text-align:right;"><form action="/detail" method="post">' +
                     '<td><input class="btn btn-primary btn-lg" type="submit" value="詳細"></td>' +
                     // 配列番号(id)
                     '<input type="hidden" name="r_id" value=' + i + '>' +
@@ -143,23 +155,32 @@
                     // 定休日(close)
                     '<input type="hidden" name="r_close" value="<%="' +
                     data.results.shop[i].close + '"%>">' +
-                    '</form><br><br>');
-                // $("#rn_list").append("</ul>");
-
-                // $("#rn_list").append("<button type=" + "button " + " onclick=" + "getLocation()" +
-                //     ">現在地取得</button><br><br>");
-                // ***javascriptだけでやる方法***
-                // const restaurant_name = document.createElement("restaurant_name");
-                // restaurant_name.textContent = data.results.shop[i].name;
-                // document.getElementById("rn_list").appendChild(restaurant_name);
-                // *****************************
+                    '</form></div><br><br>');
             }
-            lat.textContent = position.coords.latitude;
-            lon.textContent = position.coords.longitude;
         })
     };
 
-    function error(position) {
+    // 位置情報取得に失敗した場合
+    function errorCallback(error) {
+        status.textContent = "";
 
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                // 位置情報の取得がユーザーによって拒否された場合の処理
+                status.textContent = "位置情報の取得がユーザーによって拒否されました．";
+                break;
+            case error.POSITION_UNAVAILABLE:
+                // 位置情報の取得ができない場合の処理
+                status.textContent = "位置情報の取得ができませんでした．";
+                break;
+            case error.TIMEOUT:
+                // 位置情報の取得がタイムアウトした場合の処理
+                status.textContent = "位置情報の取得がタイムアウトしました．";
+                break;
+            default:
+                // その他のエラーが発生した場合の処理
+                status.textContent = "予期せぬエラーが発生しました．";
+                break;
+        }
     };
 </script>
